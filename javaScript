@@ -1,0 +1,43 @@
+document.addEventListener('DOMContentLoaded', loadExpenses);
+document.getElementById('expense-form').addEventListener('submit', addExpense);
+
+function addExpense(e) {
+    e.preventDefault();
+    const name = document.getElementById('expense-name').value;
+    const amount = document.getElementById('expense-amount').value;
+    const expenses = getExpenses();
+    expenses.push({ name, amount });
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+    document.getElementById('expense-form').reset();
+    loadExpenses();
+}
+
+function loadExpenses() {
+    const expenses = getExpenses();
+    const expenseList = document.getElementById('expense-list');
+    expenseList.innerHTML = '';
+    expenses.forEach((expense, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${expense.name}: $${expense.amount} <span class="edit-btn" onclick="editExpense(${index})">Edit</span> <span class="delete-btn" onclick="deleteExpense(${index})">Delete</span>`;
+        expenseList.appendChild(li);
+    });
+}
+
+function getExpenses() {
+    return JSON.parse(localStorage.getItem('expenses')) || [];
+}
+
+function editExpense(index) {
+    const expenses = getExpenses();
+    const expense = expenses[index];
+    document.getElementById('expense-name').value = expense.name;
+    document.getElementById('expense-amount').value = expense.amount;
+    deleteExpense(index);
+}
+
+function deleteExpense(index) {
+    const expenses = getExpenses();
+    expenses.splice(index, 1);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+    loadExpenses();
+}
